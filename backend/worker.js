@@ -23,21 +23,21 @@ app.use('*', cors({
 const rateLimit = async (c, next) => {
   const key = `ratelimit:${c.req.header('CF-Connecting-IP')}`;
   const count = await c.env.CACHE.get(key);
-  
+
   if (count && parseInt(count) > 100) {
     return c.json({ error: 'Rate limit exceeded' }, 429);
   }
-  
+
   await c.env.CACHE.put(key, (parseInt(count || 0) + 1).toString(), { expirationTtl: 900 });
   await next();
 };
 
-app.use('/api/*', rateLimit);
+// app.use('/api/*', rateLimit);
 
 // Health check
 app.get('/', (c) => {
-  return c.json({ 
-    status: 'ok', 
+  return c.json({
+    status: 'ok',
     service: 'STOCIAL API',
     environment: c.env.ENVIRONMENT,
     timestamp: new Date().toISOString()
@@ -66,7 +66,7 @@ app.get('/socket', async (c) => {
   // Get Durable Object stub
   const id = c.env.WEBSOCKET_SERVER.idFromName('global');
   const stub = c.env.WEBSOCKET_SERVER.get(id);
-  
+
   return stub.fetch(c.req.raw);
 });
 
@@ -78,7 +78,7 @@ app.notFound((c) => {
 // Error handler
 app.onError((err, c) => {
   console.error('Worker error:', err);
-  return c.json({ 
+  return c.json({
     error: 'Internal server error',
     message: err.message,
     stack: c.env.ENVIRONMENT === 'development' ? err.stack : undefined

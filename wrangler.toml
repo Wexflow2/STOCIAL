@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 
 # Workers configuration
 workers_dev = true
-route = { pattern = "api.stocial.com/*", zone_name = "stocial.com" }
+# route = { pattern = "api.stocial.com/*", zone_name = "stocial.com" }
 
 # Environment variables
 [env.production]
@@ -33,20 +33,13 @@ script_name = "stocial"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["WebSocketServer"]
+new_sqlite_classes = ["WebSocketServer"]
 
-# KV Namespaces for cache
-[[kv_namespaces]]
-binding = "CACHE"
-id = "your-kv-namespace-id"
 
-# Analytics Engine
-[[analytics_engine_datasets]]
-binding = "ANALYTICS"
 
-# Limits
-[limits]
-cpu_ms = 50
+
+
+
 
 # Build configuration
 [build]
