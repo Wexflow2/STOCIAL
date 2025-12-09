@@ -44,12 +44,12 @@ const Messages = () => {
       if (activeConversation && (message.sender_id === activeConversation.id || message.recipient_id === activeConversation.id)) {
         setMessages(prev => {
           // Avoid duplicates for own messages (already added optimistically)
-          const isDuplicate = prev.some(m => 
-            m.id === message.id || 
+          const isDuplicate = prev.some(m =>
+            m.id === message.id ||
             (m.sender_id === dbUser.id && m.content === message.content && Math.abs(new Date(m.created_at).getTime() - new Date(message.created_at).getTime()) < 2000)
           );
           if (isDuplicate) return prev;
-          
+
           return [...prev, { ...message, isOwn: message.sender_id === dbUser.id }];
         });
         scrollToBottom();
@@ -249,7 +249,7 @@ const Messages = () => {
 
   const handleReaction = async (messageId: number, emoji: string) => {
     if (!dbUser?.id) return;
-    
+
     try {
       await fetch(`http://localhost:5000/api/messages/${messageId}/reaction`, {
         method: 'POST',
@@ -262,7 +262,7 @@ const Messages = () => {
         if (msg.id === messageId) {
           const reactions = msg.reactions || [];
           const existingReaction = reactions.find((r: any) => r.user_id === dbUser.id);
-          
+
           if (existingReaction) {
             // Update or remove
             if (existingReaction.emoji === emoji) {
@@ -301,13 +301,13 @@ const Messages = () => {
 
   return (
     <MainLayout>
-      <div className="messages-container flex-1 min-h-0 flex lg:h-[calc(100vh-2rem)] lg:m-4 lg:gap-4 bg-background overflow-hidden lg:overflow-visible lg:rounded-xl">
+      <div className="messages-container flex-1 min-h-0 flex h-[calc(100dvh-3.5rem)] lg:h-[calc(100vh-2rem)] lg:m-4 lg:gap-4 bg-background overflow-hidden lg:overflow-visible lg:rounded-xl">
         {/* Conversations List */}
         <div className={cn(
           "w-full lg:w-80 flex flex-col overflow-hidden flex-shrink-0 min-h-0",
           "bg-background lg:glass-card lg:rounded-lg lg:border-r lg:border-border",
           "lg:block",
-          activeConversation ? "hidden lg:block" : "block"
+          activeConversation ? "hidden lg:block" : "block h-full"
         )}>
           <div className="p-4 border-b border-border hidden lg:block">
             <div className="flex items-center justify-between mb-4">
@@ -329,7 +329,7 @@ const Messages = () => {
               />
             </div>
           </div>
-          
+
           {/* Mobile search bar */}
           <div className="p-3 border-b border-border lg:hidden sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
             <div className="flex items-center justify-between gap-3">
@@ -377,7 +377,7 @@ const Messages = () => {
         {/* Chat Area */}
         {activeConversation ? (
           <div className={cn(
-            "messages-area flex-1 flex flex-col overflow-hidden min-h-0",
+            "messages-area flex-1 flex flex-col overflow-hidden min-h-0 h-full justify-between",
             "w-full lg:w-auto",
             "bg-background lg:glass-card lg:rounded-lg lg:border lg:border-border/60",
             activeConversation ? "block" : "hidden lg:flex"
@@ -392,7 +392,7 @@ const Messages = () => {
                 >
                   <ArrowLeft size={22} />
                 </button>
-                
+
                 <div className="relative">
                   <img
                     src={activeConversation.avatar || activeConversation.profile_picture_url || activeConversation.avatar_url}
@@ -437,7 +437,7 @@ const Messages = () => {
             )}
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto scrollbar-hide px-3 lg:px-4 pt-4 pb-6 lg:py-6 space-y-3 lg:space-y-4 bg-background">
+            <div className="flex-1 overflow-y-auto scrollbar-hide px-3 lg:px-4 pt-4 pb-20 lg:py-6 space-y-3 lg:space-y-4 bg-background">
               {loadingMessages ? (
                 <div className="flex items-center justify-center h-32 text-muted-foreground">
                   <p className="text-sm">Cargando mensajes...</p>
@@ -467,9 +467,9 @@ const Messages = () => {
             </div>
 
             {/* Input */}
-            <div className="p-3 lg:p-4 border-t border-border bg-background/95 lg:bg-background/95 backdrop-blur-sm safe-area-bottom shadow-sm">
+            <div className="fixed bottom-0 left-0 right-0 z-50 p-3 lg:static lg:p-4 border-t border-border bg-background/95 lg:bg-background/95 backdrop-blur-sm safe-area-bottom shadow-sm">
               {isRecording && (
-                <div className="flex items-center gap-3 text-xs font-semibold text-red-500 mb-2 px-2">
+                <div className="absolute bottom-full left-0 right-0 flex items-center gap-3 text-xs font-semibold text-red-500 mb-2 px-4 py-2 bg-background/95 backdrop-blur-sm">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
                   Grabando audio... {formatSeconds(recordingSeconds)}
                   <button
@@ -539,8 +539,8 @@ const Messages = () => {
         ) : (
           <div className="hidden lg:flex flex-1 glass-card flex-col items-center justify-center text-muted-foreground rounded-lg">
             <svg width="96" height="96" viewBox="0 0 96 96" fill="none" className="mb-4 opacity-30">
-              <path d="M48 8C25.9 8 8 25.9 8 48s17.9 40 40 40 40-17.9 40-40S70.1 8 48 8zm0 72c-17.6 0-32-14.4-32-32s14.4-32 32-32 32 14.4 32 32-14.4 32-32 32z" fill="currentColor"/>
-              <path d="M64 34H32c-2.2 0-4 1.8-4 4v20c0 2.2 1.8 4 4 4h32c2.2 0 4-1.8 4-4V38c0-2.2-1.8-4-4-4zm-4 20H36V42h24v12z" fill="currentColor"/>
+              <path d="M48 8C25.9 8 8 25.9 8 48s17.9 40 40 40 40-17.9 40-40S70.1 8 48 8zm0 72c-17.6 0-32-14.4-32-32s14.4-32 32-32 32 14.4 32 32-14.4 32-32 32z" fill="currentColor" />
+              <path d="M64 34H32c-2.2 0-4 1.8-4 4v20c0 2.2 1.8 4 4 4h32c2.2 0 4-1.8 4-4V38c0-2.2-1.8-4-4-4zm-4 20H36V42h24v12z" fill="currentColor" />
             </svg>
             <p className="text-lg font-medium">Tus mensajes</p>
             <p className="text-sm mt-1">Envía mensajes privados a tus amigos</p>
