@@ -21,7 +21,7 @@ const PostView = () => {
     const loadPost = async () => {
         setLoading(true);
         try {
-            const url = new URL(`http://localhost:5000/api/posts/view/${id}`);
+            const url = new URL(`https://stocial.eliverdiaz72.workers.dev/api/posts/view/${id}`);
             if (dbUser?.id) {
                 url.searchParams.append('currentUserId', dbUser.id.toString());
             }

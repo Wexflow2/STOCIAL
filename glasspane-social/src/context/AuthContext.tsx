@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (currentUser) {
         try {
-          const response = await fetch('http://localhost:5000/api/check-user', {
+          const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/check-user', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: currentUser.email, uid: currentUser.uid })
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshUser = async () => {
     if (user) {
       try {
-        const response = await fetch('http://localhost:5000/api/check-user', {
+        const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/check-user', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: user.email, uid: user.uid })

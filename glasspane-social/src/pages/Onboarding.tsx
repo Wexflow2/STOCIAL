@@ -59,7 +59,7 @@ export const Onboarding = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/generate-usernames', {
+      const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/generate-usernames', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firstName })
@@ -113,7 +113,7 @@ export const Onboarding = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/complete-onboarding', {
+      const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/complete-onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

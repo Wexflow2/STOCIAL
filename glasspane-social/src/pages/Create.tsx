@@ -35,7 +35,7 @@ const Create = () => {
 
   const fetchFollowers = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${dbUser?.id}/followers`);
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/users/${dbUser?.id}/followers`);
       if (response.ok) {
         const data = await response.json();
         setFollowers(data);
@@ -135,7 +135,7 @@ const Create = () => {
 
     setIsPublishing(true);
     try {
-      const postResponse = await fetch('http://localhost:5000/api/posts', {
+      const postResponse = await fetch('https://stocial.eliverdiaz72.workers.dev/api/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

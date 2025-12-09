@@ -18,7 +18,7 @@ export const Login = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
-      const response = await fetch('http://localhost:5000/api/check-user', {
+      const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/check-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email, uid: user.uid })

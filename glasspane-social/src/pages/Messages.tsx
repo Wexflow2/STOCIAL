@@ -78,7 +78,7 @@ const Messages = () => {
   const loadConversations = async () => {
     if (!dbUser?.id) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/conversations/${dbUser.id}`);
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/conversations/${dbUser.id}`);
       if (response.ok) {
         const data = await response.json();
         setConversations(data);
@@ -92,7 +92,7 @@ const Messages = () => {
     if (!dbUser?.id) return;
     setLoadingMessages(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/messages/${dbUser.id}/${otherUserId}`);
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/messages/${dbUser.id}/${otherUserId}`);
       if (response.ok) {
         const data = await response.json();
         setMessages(data.map((msg: any) => ({ ...msg, isOwn: msg.sender_id === dbUser.id })));
@@ -128,7 +128,7 @@ const Messages = () => {
       scrollToBottom();
       setNewMessage("");
 
-      await fetch('http://localhost:5000/api/messages', {
+      await fetch('https://stocial.eliverdiaz72.workers.dev/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(messageData)
@@ -197,7 +197,7 @@ const Messages = () => {
   const handleAcceptRequest = async () => {
     if (!dbUser || !activeConversation) return;
     try {
-      await fetch('http://localhost:5000/api/conversations/accept', {
+      await fetch('https://stocial.eliverdiaz72.workers.dev/api/conversations/accept', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user1_id: dbUser.id, user2_id: activeConversation.id })
@@ -213,7 +213,7 @@ const Messages = () => {
   const searchUsers = async (q: string) => {
     if (!q.trim()) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/search-users?q=${q}`);
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/search-users?q=${q}`);
       if (response.ok) {
         const data = await response.json();
         setAvailableUsers(data.users.filter((u: any) => u.id !== dbUser?.id));
@@ -251,7 +251,7 @@ const Messages = () => {
     if (!dbUser?.id) return;
 
     try {
-      await fetch(`http://localhost:5000/api/messages/${messageId}/reaction`, {
+      await fetch(`https://stocial.eliverdiaz72.workers.dev/api/messages/${messageId}/reaction`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: dbUser.id, emoji })

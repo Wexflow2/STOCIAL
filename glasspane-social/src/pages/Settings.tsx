@@ -267,7 +267,7 @@ const Settings = () => {
     
     setSavingPrivacy(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${dbUser.id}/privacy`, {
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/users/${dbUser.id}/privacy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_private: !isPrivate })

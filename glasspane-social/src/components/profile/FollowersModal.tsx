@@ -32,8 +32,8 @@ export function FollowersModal({ isOpen, onClose, userId, type }: FollowersModal
     setLoading(true);
     try {
       const endpoint = type === "followers" 
-        ? `http://localhost:5000/api/users/${userId}/followers`
-        : `http://localhost:5000/api/users/${userId}/following`;
+        ? `https://stocial.eliverdiaz72.workers.dev/api/users/${userId}/followers`
+        : `https://stocial.eliverdiaz72.workers.dev/api/users/${userId}/following`;
       
       const response = await fetch(endpoint);
       if (response.ok) {

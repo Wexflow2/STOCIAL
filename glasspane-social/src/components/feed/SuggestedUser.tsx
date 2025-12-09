@@ -22,7 +22,7 @@ export function SuggestedUser({ id, username, name, avatar, reason = "Sugerencia
     if (!dbUser?.id || isFollowing || isPending) return;
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/follow", {
+      const response = await fetch("https://stocial.eliverdiaz72.workers.dev/api/follow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ following_id: id, follower_id: dbUser.id }),

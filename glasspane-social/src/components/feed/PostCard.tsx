@@ -209,7 +209,7 @@ export function PostCard({
     setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
 
     try {
-      await fetch("http://localhost:5000/api/likes", {
+      await fetch("https://stocial.eliverdiaz72.workers.dev/api/likes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ post_id: id, user_id: dbUser.id }),
@@ -228,7 +228,7 @@ export function PostCard({
     setIsSaved(!isSaved);
 
     try {
-      await fetch("http://localhost:5000/api/saved", {
+      await fetch("https://stocial.eliverdiaz72.workers.dev/api/saved", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ post_id: id, user_id: dbUser.id }),
@@ -267,7 +267,7 @@ export function PostCard({
     if (!newComment.trim() || !dbUser) return;
 
     try {
-      await fetch("http://localhost:5000/api/comments", {
+      await fetch("https://stocial.eliverdiaz72.workers.dev/api/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ post_id: id, user_id: dbUser.id, content: newComment }),
@@ -285,7 +285,7 @@ export function PostCard({
     }
 
     try {
-      const url = new URL(`http://localhost:5000/api/comments/${id}`);
+      const url = new URL(`https://stocial.eliverdiaz72.workers.dev/api/comments/${id}`);
       if (dbUser?.id) {
         url.searchParams.append('currentUserId', dbUser.id.toString());
       }
@@ -304,7 +304,7 @@ export function PostCard({
     if (!dbUser) return;
 
     try {
-      const response = await fetch("http://localhost:5000/api/comments/like", {
+      const response = await fetch("https://stocial.eliverdiaz72.workers.dev/api/comments/like", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ comment_id: commentId, user_id: dbUser.id }),
@@ -338,7 +338,7 @@ export function PostCard({
     if (!confirmed) return;
     setActionLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/posts/${id}`, {
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/posts/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: dbUser.id }),
@@ -359,7 +359,7 @@ export function PostCard({
     const next = !isPrivate;
     setActionLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/posts/${id}/privacy`, {
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/posts/${id}/privacy`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: dbUser.id, is_private: next }),
@@ -425,7 +425,7 @@ export function PostCard({
   const handlePollVote = async (optionIndex: number) => {
     if (!dbUser || typeof optionIndex !== "number") return;
     try {
-      const response = await fetch(`http://localhost:5000/api/posts/${id}/poll-vote`, {
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/posts/${id}/poll-vote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: dbUser.id, option_index: optionIndex }),

@@ -7,7 +7,7 @@ const getApiUrl = () => {
   }
   
   // Fallback para desarrollo
-  return 'http://localhost:5000';
+  return 'https://stocial.eliverdiaz72.workers.dev';
 };
 
 export const API_BASE_URL = getApiUrl();

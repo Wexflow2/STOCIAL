@@ -43,7 +43,7 @@ const Notifications = () => {
 
   const loadNotifications = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/notifications/${dbUser?.id}`);
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/notifications/${dbUser?.id}`);
       if (response.ok) {
         const data = await response.json();
         setNotifications(data);
@@ -80,7 +80,7 @@ const Notifications = () => {
   const handleAcceptFollow = async (e: React.MouseEvent, notificationId: number, senderId: number) => {
     e.stopPropagation();
     try {
-      await fetch('http://localhost:5000/api/follow/accept', {
+      await fetch('https://stocial.eliverdiaz72.workers.dev/api/follow/accept', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ follower_id: senderId, following_id: dbUser?.id })
@@ -96,7 +96,7 @@ const Notifications = () => {
   const handleRejectFollow = async (e: React.MouseEvent, notificationId: number, senderId: number) => {
     e.stopPropagation();
     try {
-      await fetch('http://localhost:5000/api/follow/reject', {
+      await fetch('https://stocial.eliverdiaz72.workers.dev/api/follow/reject', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ follower_id: senderId, following_id: dbUser?.id })

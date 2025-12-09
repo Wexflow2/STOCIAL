@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
 interface SocketContextType {
-    socket: Socket | null;
+    socket: WebSocket | null;
     isConnected: boolean;
     onlineUsers: Set<number>;
 }
@@ -18,44 +17,56 @@ export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     const { dbUser } = useAuth();
-    const [socket, setSocket] = useState<Socket | null>(null);
+    const [socket, setSocket] = useState<WebSocket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [onlineUsers, setOnlineUsers] = useState<Set<number>>(new Set());
 
     useEffect(() => {
-        const socketUrl = import.meta.env.VITE_API_URL?.replace('/api', '').replace('http://', 'https://') || 'http://localhost:5000';
-        const newSocket = io(socketUrl, {
-            transports: ['websocket', 'polling'],
-            upgrade: true,
-        });
+        // Determine WebSocket URL based on API URL
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://stocial.eliverdiaz72.workers.dev';
+        const wsUrl = apiUrl.replace('http', 'ws').replace('https', 'wss') + '/socket';
 
-        newSocket.on('connect', () => {
+        console.log('Connecting to WebSocket:', wsUrl);
+
+        const newSocket = new WebSocket(wsUrl);
+
+        newSocket.onopen = () => {
             console.log('Connected to socket server');
             setIsConnected(true);
-            
+
             // Notify server that user is online
             if (dbUser?.id) {
-                newSocket.emit('user_online', dbUser.id);
+                newSocket.send(JSON.stringify({ type: 'user_online', userId: dbUser.id }));
             }
-        });
+        };
 
-        newSocket.on('disconnect', () => {
+        newSocket.onclose = () => {
             console.log('Disconnected from socket server');
             setIsConnected(false);
-        });
+        };
 
-        // Listen for user status changes
-        newSocket.on('user_status_change', ({ userId, isOnline }: { userId: number; isOnline: boolean }) => {
-            setOnlineUsers(prev => {
-                const newSet = new Set(prev);
-                if (isOnline) {
-                    newSet.add(userId);
-                } else {
-                    newSet.delete(userId);
+        newSocket.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+
+                if (data.type === 'user_status_change') {
+                    const { userId, isOnline } = data;
+                    setOnlineUsers(prev => {
+                        const newSet = new Set(prev);
+                        if (isOnline) {
+                            newSet.add(userId);
+                        } else {
+                            newSet.delete(userId);
+                        }
+                        return newSet;
+                    });
+                } else if (data.type === 'online_users') {
+                    setOnlineUsers(new Set(data.users));
                 }
-                return newSet;
-            });
-        });
+            } catch (error) {
+                console.error('Error parsing websocket message:', error);
+            }
+        };
 
         setSocket(newSocket);
 
@@ -63,19 +74,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
             newSocket.close();
         };
     }, [dbUser?.id]);
-
-    // Fetch initial online users
-    useEffect(() => {
-        if (isConnected) {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-            fetch(`${apiUrl}/api/users/online`)
-                .then(res => res.json())
-                .then(data => {
-                    setOnlineUsers(new Set(data.onlineUsers));
-                })
-                .catch(err => console.error('Error fetching online users:', err));
-        }
-    }, [isConnected]);
 
     return (
         <SocketContext.Provider value={{ socket, isConnected, onlineUsers }}>

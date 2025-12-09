@@ -17,7 +17,7 @@ export const Stories = () => {
     if (!dbUser?.id) return;
     setLoadingFeed(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/stories/feed?currentUserId=${dbUser.id}`);
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/stories/feed?currentUserId=${dbUser.id}`);
       if (response.ok) {
         const data = await response.json();
         setStories(data);
@@ -49,7 +49,7 @@ export const Stories = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/stories', {
+      const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/stories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

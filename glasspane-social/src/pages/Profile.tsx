@@ -108,7 +108,7 @@ const Profile = () => {
 
   const loadFollowingCount = async (userId: number) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/following`);
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/users/${userId}/following`);
       if (response.ok) {
         const data = await response.json();
         setProfileData((prev) => ({ ...prev, following: data.length.toString() }));
@@ -120,7 +120,7 @@ const Profile = () => {
 
   const loadUserProfile = async (username: string) => {
     try {
-      const searchUrl = new URL(`http://localhost:5000/api/search-users`);
+      const searchUrl = new URL(`https://stocial.eliverdiaz72.workers.dev/api/search-users`);
       searchUrl.searchParams.set("q", username);
       if (dbUser?.id) {
         searchUrl.searchParams.set("currentUserId", dbUser.id.toString());
@@ -135,7 +135,7 @@ const Profile = () => {
           let detailedUser = foundUser;
 
           try {
-            const detailResponse = await fetch(`http://localhost:5000/api/users/${foundUser.id}`);
+            const detailResponse = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/users/${foundUser.id}`);
             if (detailResponse.ok) {
               const detailData = await detailResponse.json();
               detailedUser = { ...foundUser, ...detailData };
@@ -184,11 +184,11 @@ const Profile = () => {
 
     setLoadingPosts(true);
     try {
-      let endpoint = `http://localhost:5000/api/posts/${userId}`;
+      let endpoint = `https://stocial.eliverdiaz72.workers.dev/api/posts/${userId}`;
       if (activeTab === "saved") {
-        endpoint = `http://localhost:5000/api/users/${userId}/saved-posts`;
+        endpoint = `https://stocial.eliverdiaz72.workers.dev/api/users/${userId}/saved-posts`;
       } else if (activeTab === "liked") {
-        endpoint = `http://localhost:5000/api/users/${userId}/liked-posts`;
+        endpoint = `https://stocial.eliverdiaz72.workers.dev/api/users/${userId}/liked-posts`;
       }
 
       const url = new URL(endpoint);
@@ -220,7 +220,7 @@ const Profile = () => {
   const loadStoryStatus = async (targetUserId: number) => {
     if (!dbUser?.id) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/stories/feed?currentUserId=${dbUser.id}`);
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/stories/feed?currentUserId=${dbUser.id}`);
       if (response.ok) {
         const data = await response.json();
         const found = data.find((entry: any) => entry.user_id === targetUserId) || null;
@@ -368,7 +368,7 @@ const Profile = () => {
     if (!profileData.id || !dbUser?.id) return;
 
     try {
-      const response = await fetch("http://localhost:5000/api/follow", {
+      const response = await fetch("https://stocial.eliverdiaz72.workers.dev/api/follow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ following_id: profileData.id, follower_id: dbUser.id }),

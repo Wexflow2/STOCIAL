@@ -19,7 +19,7 @@ const Explore = () => {
   const searchUsers = async (q: string) => {
     setLoading(true);
     try {
-      const url = new URL('http://localhost:5000/api/search-users');
+      const url = new URL('https://stocial.eliverdiaz72.workers.dev/api/search-users');
       url.searchParams.append('q', q || '%');
       if (dbUser?.id) {
         url.searchParams.append('currentUserId', dbUser.id.toString());
@@ -38,7 +38,7 @@ const Explore = () => {
   const loadTrending = async () => {
     setLoading(true);
     try {
-      const url = new URL('http://localhost:5000/api/posts/trending');
+      const url = new URL('https://stocial.eliverdiaz72.workers.dev/api/posts/trending');
       if (dbUser?.id) {
         url.searchParams.append('currentUserId', dbUser.id.toString());
       }
@@ -56,7 +56,7 @@ const Explore = () => {
 
   const handleFollow = async (userId: number) => {
     try {
-      const response = await fetch('http://localhost:5000/api/follow', {
+      const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/follow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ following_id: userId, follower_id: dbUser?.id })

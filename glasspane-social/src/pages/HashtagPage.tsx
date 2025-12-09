@@ -21,7 +21,7 @@ const HashtagPage = () => {
     const loadPosts = async () => {
         setLoading(true);
         try {
-            const url = new URL(`http://localhost:5000/api/posts/hashtag/${tag}`);
+            const url = new URL(`https://stocial.eliverdiaz72.workers.dev/api/posts/hashtag/${tag}`);
             if (dbUser?.id) {
                 url.searchParams.append('currentUserId', dbUser.id.toString());
             }

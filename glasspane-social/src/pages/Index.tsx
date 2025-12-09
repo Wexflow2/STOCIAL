@@ -85,7 +85,7 @@ const Index = () => {
   const loadFeed = async () => {
     setLoadingFeed(true);
     try {
-      const url = new URL('http://localhost:5000/api/feed');
+      const url = new URL('https://stocial.eliverdiaz72.workers.dev/api/feed');
       if (dbUser?.id) {
         url.searchParams.append('currentUserId', dbUser.id.toString());
       }
@@ -104,7 +104,7 @@ const Index = () => {
 
   const loadSuggestedUsers = async () => {
     try {
-      const url = new URL('http://localhost:5000/api/users/suggested');
+      const url = new URL('https://stocial.eliverdiaz72.workers.dev/api/users/suggested');
       if (dbUser?.id) {
         url.searchParams.append('currentUserId', dbUser.id.toString());
       }
@@ -121,7 +121,7 @@ const Index = () => {
   const loadStories = async () => {
     if (!dbUser?.id) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/stories/feed?currentUserId=${dbUser.id}`);
+      const response = await fetch(`https://stocial.eliverdiaz72.workers.dev/api/stories/feed?currentUserId=${dbUser.id}`);
       if (response.ok) {
         const data = await response.json();
         setStories(data);

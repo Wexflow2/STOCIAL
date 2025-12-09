@@ -38,7 +38,7 @@ export function CreateStory({ onClose, onStoryCreated }: CreateStoryProps) {
                 try {
                     const base64 = reader.result as string;
 
-                    const response = await fetch('http://localhost:5000/api/stories', {
+                    const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/stories', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
