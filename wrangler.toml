@@ -1,0 +1,56 @@
+# Cloudflare Workers Configuration
+name = "stocial"
+main = "backend/worker.js"
+compatibility_date = "2024-01-01"
+node_compat = true
+
+# Workers configuration
+workers_dev = true
+route = { pattern = "api.stocial.com/*", zone_name = "stocial.com" }
+
+# Environment variables
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.production.d1_databases]
+binding = "DB"
+database_name = "stocial-production"
+database_id = "your-database-id-here"
+
+[env.production.r2_buckets]
+binding = "MEDIA"
+bucket_name = "stocial-media"
+
+# Development environment
+[env.development]
+vars = { ENVIRONMENT = "development" }
+
+# Durable Objects for WebSocket
+[[durable_objects.bindings]]
+name = "WEBSOCKET_SERVER"
+class_name = "WebSocketServer"
+script_name = "stocial"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["WebSocketServer"]
+
+# KV Namespaces for cache
+[[kv_namespaces]]
+binding = "CACHE"
+id = "your-kv-namespace-id"
+
+# Analytics Engine
+[analytics_engine_datasets]
+binding = "ANALYTICS"
+
+# Limits
+[limits]
+cpu_ms = 50
+
+# Build configuration
+[build]
+command = "npm install"
+
+[build.upload]
+format = "service-worker"

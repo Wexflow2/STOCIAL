@@ -1,0 +1,366 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 97%;
+    --foreground: 220 20% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+
+    --primary: 220 15% 20%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 94%;
+    --secondary-foreground: 220 15% 20%;
+
+    --muted: 220 15% 92%;
+    --muted-foreground: 220 10% 45%;
+
+    --accent: 220 20% 96%;
+    --accent-foreground: 220 15% 20%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 220 15% 50%;
+
+    --radius: 1.25rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 20% 10%;
+    --sidebar-primary: 220 15% 20%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 96%;
+    --sidebar-accent-foreground: 220 15% 20%;
+    --sidebar-border: 220 15% 90%;
+    --sidebar-ring: 220 15% 50%;
+
+    --chart-1: 200 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 340 75% 55%;
+    --chart-5: 280 65% 60%;
+
+    --glass-bg: 0 0% 100%;
+    --glass-border: 220 20% 92%;
+    --glass-shadow: 220 30% 80%;
+
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .dark {
+    --background: 220 20% 8%;
+    --foreground: 220 10% 95%;
+
+    --card: 220 20% 12%;
+    --card-foreground: 220 10% 95%;
+
+    --popover: 220 20% 12%;
+    --popover-foreground: 220 10% 95%;
+
+    --primary: 220 10% 95%;
+    --primary-foreground: 220 20% 10%;
+
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 220 10% 95%;
+
+    --muted: 220 15% 18%;
+    --muted-foreground: 220 10% 55%;
+
+    --accent: 220 15% 22%;
+    --accent-foreground: 220 10% 95%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 22%;
+    --input: 220 15% 22%;
+    --ring: 220 15% 50%;
+
+    --sidebar-background: 220 20% 10%;
+    --sidebar-foreground: 220 10% 95%;
+    --sidebar-primary: 220 10% 95%;
+    --sidebar-primary-foreground: 220 20% 10%;
+    --sidebar-accent: 220 15% 18%;
+    --sidebar-accent-foreground: 220 10% 95%;
+    --sidebar-border: 220 15% 20%;
+    --sidebar-ring: 220 15% 50%;
+
+    --glass-bg: 220 20% 15%;
+    --glass-border: 220 15% 25%;
+    --glass-shadow: 220 30% 5%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-card/70 backdrop-blur-xl border border-glass-border shadow-glass;
+  }
+
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-2xl border border-glass-border rounded-2xl shadow-glass;
+  }
+
+  .glass-sidebar {
+    @apply bg-sidebar/80 backdrop-blur-2xl border-r border-glass-border;
+  }
+
+  .glass-input {
+    @apply bg-background/50 backdrop-blur-lg border border-glass-border rounded-xl;
+  }
+
+  .glass-button {
+    @apply bg-card/60 backdrop-blur-xl border border-glass-border hover:bg-card/80 transition-all duration-300;
+  }
+
+  .avatar-ring {
+    @apply ring-2 ring-offset-2 ring-offset-background ring-primary/20;
+  }
+
+  .story-gradient {
+    background: linear-gradient(135deg, hsl(200 70% 50%), hsl(160 60% 45%));
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .slide-in {
+    animation: slideIn 0.3s ease-out forwards;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Profile-specific utilities */
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--foreground)), hsl(var(--foreground) / 0.7));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .profile-avatar-glow {
+    @apply transition-all duration-500;
+  }
+
+  .profile-avatar-glow:hover {
+    box-shadow: 0 0 30px hsl(var(--primary) / 0.3), 0 0 60px hsl(var(--primary) / 0.15);
+    transform: scale(1.03);
+  }
+
+  .stats-hover {
+    @apply transition-all duration-300 cursor-pointer;
+  }
+
+  .stats-hover:hover {
+    transform: scale(1.05);
+  }
+
+  .stats-hover:hover .gradient-text {
+    filter: brightness(1.2);
+  }
+
+  .tab-indicator {
+    position: relative;
+  }
+
+  .tab-indicator::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: hsl(var(--foreground));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .tab-indicator.active::after {
+    transform: scaleX(1);
+  }
+
+  .zoom-hover {
+    @apply transition-transform duration-500 ease-out;
+  }
+
+  .zoom-hover:hover {
+    transform: scale(1.08);
+  }
+
+  .overlay-gradient {
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+  }
+
+  @keyframes pulse-glow {
+
+    0%,
+    100% {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.2);
+    }
+
+    50% {
+      box-shadow: 0 0 40px hsl(var(--primary) / 0.35);
+    }
+  }
+
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes scale-up {
+    from {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .scale-up {
+    animation: scale-up 0.3s ease-out forwards;
+  }
+
+  .high-contrast {
+    filter: contrast(1.05) saturate(1.05);
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Mobile optimizations */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Touch optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
+
+  /* Smooth scrolling on mobile */
+  @media (max-width: 1024px) {
+    * {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Disable hover effects on touch devices */
+    .hover\:scale-110:hover {
+      transform: scale(1);
+    }
+
+    .hover\:scale-110:active {
+      transform: scale(0.95);
+    }
+  }
+
+  /* Instagram-like feed spacing on mobile */
+  @media (max-width: 640px) {
+    .glass-card {
+      @apply shadow-none;
+    }
+
+    /* Remove extra padding on mobile for full-width feel */
+    .mobile-full-width {
+      margin-left: calc(-1 * var(--container-padding, 0));
+      margin-right: calc(-1 * var(--container-padding, 0));
+      width: calc(100% + 2 * var(--container-padding, 0));
+    }
+  }
+
+  /* Better text rendering */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Prevent zoom on input focus (iOS) */
+  @media (max-width: 768px) {
+    input[type="text"],
+    input[type="search"],
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Messages page mobile optimization */
+  @media (max-width: 1024px) {
+    .messages-container {
+      background-color: hsl(var(--background));
+      border-radius: 0;
+    }
+    
+    .messages-area {
+      background-color: hsl(var(--background));
+      border: none;
+      border-radius: 0;
+    }
+  }
+}

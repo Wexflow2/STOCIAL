@@ -1,0 +1,13 @@
+{
+  "name": "stocial",
+  "version": "1.0.0",
+  "description": "Red social completa con PostgreSQL",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd glasspane-social && npm run dev",
+    "dev:full": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" --names \"backend,frontend\" --prefix-colors \"blue,green\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
