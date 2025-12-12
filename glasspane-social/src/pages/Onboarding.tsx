@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Loader, ChevronRight, LogOut } from 'lucide-react';
 import confetti from 'confetti-js';
+import { API_ENDPOINTS } from '@/config/api';
 
 export const Onboarding = () => {
   const navigate = useNavigate();
-  const { user, logout, refreshUser } = useAuth();
+  const { user, logout, refreshUser, loading: authLoading } = useAuth();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -17,12 +18,13 @@ export const Onboarding = () => {
   const [username, setUsername] = useState('');
   const [usernameOptions, setUsernameOptions] = useState<string[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
+  const apiBase = API_ENDPOINTS.api;
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       navigate('/login');
     }
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
   const triggerConfetti = () => {
     setShowConfetti(true);
@@ -59,17 +61,22 @@ export const Onboarding = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/generate-usernames', {
+      const response = await fetch(`${apiBase}/generate-usernames`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firstName })
       });
 
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'No se pudieron generar nombres de usuario');
+      }
+
       setUsernameOptions(data.usernames || []);
       setUsername(data.usernames?.[0] || '');
     } catch (err) {
       console.error('Error generating usernames:', err);
+      setError(err instanceof Error ? err.message : 'No se pudieron generar nombres de usuario');
     } finally {
       setLoading(false);
     }
@@ -113,7 +120,7 @@ export const Onboarding = () => {
     setError('');
 
     try {
-      const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/complete-onboarding', {
+      const response = await fetch(`${apiBase}/complete-onboarding`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -127,16 +134,19 @@ export const Onboarding = () => {
         })
       });
 
-      if (response.ok) {
-        // Refrescar el usuario en el contexto
-        await refreshUser();
-        triggerConfetti();
-        setTimeout(() => {
-          navigate('/');
-        }, 2000);
-      } else {
-        setError('Error al completar el onboarding');
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al completar el onboarding');
       }
+
+      if (data?.id) {
+        await refreshUser();
+      }
+
+      triggerConfetti();
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
     } catch (err: any) {
       setError(err.message || 'Error al completar el onboarding');
     } finally {
@@ -148,6 +158,17 @@ export const Onboarding = () => {
     await logout();
     navigate('/login');
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-background to-background/50 flex items-center justify-center px-4 py-12 relative">

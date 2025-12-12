@@ -34,4 +34,30 @@ app.post('/register', async (c) => {
   }
 });
 
+// Check user existence
+app.post('/check-user', async (c) => {
+  try {
+    const { firebase_uid, uid, email } = await c.req.json();
+    const firebaseUid = firebase_uid || uid;
+
+    if (!c.env.DB) {
+      return c.json({ error: 'Database binding not configured', isNewUser: true }, 500);
+    }
+
+    const { results } = await c.env.DB.prepare(`
+      SELECT * FROM users WHERE firebase_uid = ? OR email = ?
+    `).bind(firebaseUid, email).all();
+
+    if (results.length > 0) {
+      const user = results[0];
+      return c.json({ isNewUser: false, user, userId: user.id });
+    }
+
+    return c.json({ isNewUser: true });
+  } catch (error) {
+    console.error('Error checking user:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
 export default app;

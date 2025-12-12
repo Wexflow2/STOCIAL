@@ -13,7 +13,7 @@ const app = new Hono();
 
 // Middleware
 app.use('*', logger());
-app.use('*', compress());
+// app.use('*', compress());
 app.use('*', cors({
   origin: (origin) => origin,
   credentials: true,
@@ -49,12 +49,32 @@ import postsRouter from './routes/posts';
 import usersRouter from './routes/users';
 import authRouter from './routes/auth';
 import messagesRouter from './routes/messages';
+import onboardingRouter from './routes/onboarding';
 
 // Mount routes
 app.route('/api/posts', postsRouter);
+
+// Online users route (workaround for users.js issue)
+app.get('/api/users/online', async (c) => {
+  try {
+    if (!c.env.WEBSOCKET_SERVER) {
+      return c.json({ error: 'Binding missing', env: Object.keys(c.env) }, 200);
+    }
+    const id = c.env.WEBSOCKET_SERVER.idFromName('global');
+    const stub = c.env.WEBSOCKET_SERVER.get(id);
+    const response = await stub.fetch('http://do/online-users');
+    const data = await response.json();
+    return c.json({ onlineUsers: data.users });
+  } catch (e) {
+    return c.json({ error: String(e), stack: e.stack }, 200);
+  }
+});
+
+// Routes
 app.route('/api/users', usersRouter);
 app.route('/api/auth', authRouter);
 app.route('/api/messages', messagesRouter);
+app.route('/api', onboardingRouter);
 
 // WebSocket upgrade handler
 app.get('/socket', async (c) => {
@@ -78,11 +98,12 @@ app.notFound((c) => {
 // Error handler
 app.onError((err, c) => {
   console.error('Worker error:', err);
+  const safeEnv = c && c.env ? Object.keys(c.env) : ['c.env is missing'];
   return c.json({
     error: 'Internal server error',
-    message: err.message,
-    stack: c.env.ENVIRONMENT === 'development' ? err.stack : undefined
-  }, 500);
+    raw_error: String(err),
+    env_keys: safeEnv
+  }, 200);
 });
 
 export default {

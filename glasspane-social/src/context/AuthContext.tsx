@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface AuthContextType {
   user: User | null;
@@ -13,6 +14,19 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const CHECK_USER_URL = `${API_ENDPOINTS.api}/auth/check-user`;
+
+const normalizeUserResponse = (data: any) => {
+  const isNewUser = typeof data.isNewUser === 'boolean'
+    ? data.isNewUser
+    : (typeof data.exists === 'boolean' ? !data.exists : !data.user);
+
+  return {
+    isNewUser: !!isNewUser,
+    user: data.user || null
+  };
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -65,18 +79,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (currentUser) {
         try {
-          const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/check-user', {
+          const response = await fetch(CHECK_USER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: currentUser.email, uid: currentUser.uid })
           });
-          const data = await response.json();
 
-          if (data.isNewUser) {
-            persistUserState(null, true);
-          } else {
-            persistUserState(data.user, false);
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || 'Error verifying user');
           }
+
+          const normalized = normalizeUserResponse(data);
+          persistUserState(normalized.user, normalized.isNewUser);
         } catch (error) {
           console.error('Error checking user:', error);
         }
@@ -103,18 +118,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshUser = async () => {
     if (user) {
       try {
-        const response = await fetch('https://stocial.eliverdiaz72.workers.dev/api/check-user', {
+        const response = await fetch(CHECK_USER_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: user.email, uid: user.uid })
         });
         const data = await response.json();
 
-        if (data.isNewUser) {
-          persistUserState(null, true);
-        } else {
-          persistUserState(data.user, false);
+        if (!response.ok) {
+          throw new Error(data.error || 'Error verifying user');
         }
+
+        const normalized = normalizeUserResponse(data);
+        persistUserState(normalized.user, normalized.isNewUser);
       } catch (error) {
         console.error('Error refreshing user:', error);
       }
