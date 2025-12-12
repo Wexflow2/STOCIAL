@@ -6,6 +6,28 @@ import { Hono } from 'hono';
 
 const app = new Hono();
 
+const getSupabaseConfig = (env) => {
+  const url = env.SUPABASE_URL;
+  const key = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase config missing');
+  }
+  return { url, key };
+};
+
+const supabaseRequest = async (env, path, init = {}) => {
+  const { url, key } = getSupabaseConfig(env);
+  const target = `${url}/rest/v1${path}`;
+  const headers = {
+    apikey: key,
+    Authorization: `Bearer ${key}`,
+    Prefer: 'return=representation',
+    ...init.headers,
+  };
+  const res = await fetch(target, { ...init, headers });
+  return res;
+};
+
 // Generate username suggestions
 app.post('/generate-usernames', async (c) => {
   try {
@@ -15,24 +37,26 @@ app.post('/generate-usernames', async (c) => {
       return c.json({ error: 'El nombre es requerido', usernames: [] }, 400);
     }
 
-    if (!c.env.DB) {
-      return c.json({ error: 'Database binding not configured', usernames: [] }, 500);
-    }
-
     const baseUsername = firstName.toLowerCase().replace(/\s+/g, '');
     const usernames = [];
     let attempts = 0;
+
+    const { url } = getSupabaseConfig(c.env);
 
     while (usernames.length < 5 && attempts < 30) {
       const suffix = attempts === 0 ? '' : Math.floor(Math.random() * 1000);
       const candidate = `${baseUsername}${suffix}`;
 
-      const { results } = await c.env.DB.prepare(
-        'SELECT id FROM users WHERE LOWER(username) = LOWER(?) LIMIT 1'
-      ).bind(candidate).all();
+      const lookup = new URL(`${url}/rest/v1/users`);
+      lookup.searchParams.set('select', 'id');
+      lookup.searchParams.set('username', `ilike.${candidate}`);
+      lookup.searchParams.set('limit', '1');
 
-      if (results.length === 0 && !usernames.includes(candidate)) {
-        usernames.push(candidate);
+      const res = await supabaseRequest(c.env, lookup.pathname + lookup.search, { method: 'GET' });
+      const rows = await res.json();
+
+      if (res.ok && Array.isArray(rows) && rows.length === 0 && !usernames.includes(candidate)) {
+        usernames.push(candidate.toLowerCase());
       }
 
       attempts++;
@@ -55,36 +79,46 @@ app.post('/complete-onboarding', async (c) => {
       return c.json({ error: 'Faltan datos requeridos' }, 400);
     }
 
-    if (!c.env.DB) {
-      return c.json({ error: 'Database binding not configured' }, 500);
-    }
+    const { url } = getSupabaseConfig(c.env);
 
     // Check username availability
-    const { results: usernameCheck } = await c.env.DB.prepare(
-      'SELECT id FROM users WHERE LOWER(username) = LOWER(?) LIMIT 1'
-    ).bind(username).all();
+    const lookup = new URL(`${url}/rest/v1/users`);
+    lookup.searchParams.set('select', 'id');
+    lookup.searchParams.set('username', `ilike.${username}`);
+    lookup.searchParams.set('limit', '1');
 
-    if (usernameCheck.length > 0) {
+    const usernameRes = await supabaseRequest(c.env, lookup.pathname + lookup.search, { method: 'GET' });
+    const usernameRows = await usernameRes.json();
+    if (!usernameRes.ok) {
+      return c.json({ error: usernameRows?.message || 'Error checking username' }, 500);
+    }
+
+    if (Array.isArray(usernameRows) && usernameRows.length > 0) {
       return c.json({ error: 'Username already taken' }, 400);
     }
 
     const fullName = `${firstName} ${lastName}`.trim();
 
-    const { results } = await c.env.DB.prepare(`
-      INSERT INTO users (firebase_uid, email, username, name, bio, profile_picture_url, birth_date, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      RETURNING *
-    `).bind(
-      firebaseUid,
-      email,
-      username,
-      fullName,
-      '',
-      profilePictureUrl || null,
-      birthDate || null
-    ).all();
+    const insertRes = await supabaseRequest(c.env, '/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firebase_uid: firebaseUid,
+        email,
+        username,
+        name: fullName,
+        bio: '',
+        profile_picture_url: profilePictureUrl || null,
+        birth_date: birthDate || null,
+      }),
+    });
 
-    const newUser = results[0];
+    const created = await insertRes.json();
+    if (!insertRes.ok) {
+      return c.json({ error: created?.message || 'Error creating user' }, 500);
+    }
+
+    const newUser = Array.isArray(created) ? created[0] : created;
     return c.json(newUser, 201);
   } catch (error) {
     console.error('Error completing onboarding:', error);
