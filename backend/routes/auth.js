@@ -35,13 +35,12 @@ app.post('/register', async (c) => {
   try {
     const { firebase_uid, email, username, name } = await c.req.json();
 
-    const { url, key } = getSupabaseConfig(c.env);
-    const lookup = new URL(`${url}/rest/v1/users`);
+    const lookup = new URL('https://dummy.local'); // base not used
     lookup.searchParams.set('select', '*');
-    lookup.searchParams.append('or', `firebase_uid.eq.${firebase_uid},email.eq.${email}`);
+    lookup.searchParams.set('or', `(firebase_uid.eq.${firebase_uid},email.eq.${email})`);
     lookup.searchParams.set('limit', '1');
 
-    const existingRes = await supabaseRequest(c.env, lookup.pathname + lookup.search, { method: 'GET' });
+    const existingRes = await supabaseRequest(c.env, `/users${lookup.search}`, { method: 'GET' });
     if (!existingRes.ok) {
       const text = await existingRes.text();
       throw new Error(`Supabase lookup failed: ${text}`);
@@ -51,7 +50,7 @@ app.post('/register', async (c) => {
       return c.json(existing[0]);
     }
 
-    const insertRes = await supabaseRequest(c.env, '/users', {
+    const insertRes = await supabaseRequest(c.env, `/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ firebase_uid, email, username, name }),
@@ -79,11 +78,10 @@ app.post('/check-user', async (c) => {
       return c.json({ error: 'Missing identifiers', isNewUser: true }, 400);
     }
 
-    const { url } = getSupabaseConfig(c.env);
-    const lookup = new URL(`${url}/rest/v1/users`);
+    const lookup = new URL('https://dummy.local'); // base not used
     lookup.searchParams.set('select', '*');
     if (firebaseUid && email) {
-      lookup.searchParams.append('or', `firebase_uid.eq.${firebaseUid},email.eq.${email}`);
+      lookup.searchParams.set('or', `(firebase_uid.eq.${firebaseUid},email.eq.${email})`);
     } else if (firebaseUid) {
       lookup.searchParams.set('firebase_uid', `eq.${firebaseUid}`);
     } else {
@@ -91,7 +89,7 @@ app.post('/check-user', async (c) => {
     }
     lookup.searchParams.set('limit', '1');
 
-    const response = await supabaseRequest(c.env, lookup.pathname + lookup.search, { method: 'GET' });
+    const response = await supabaseRequest(c.env, `/users${lookup.search}`, { method: 'GET' });
     const data = await response.json();
 
     if (!response.ok) {

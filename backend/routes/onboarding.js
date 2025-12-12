@@ -41,18 +41,16 @@ app.post('/generate-usernames', async (c) => {
     const usernames = [];
     let attempts = 0;
 
-    const { url } = getSupabaseConfig(c.env);
-
     while (usernames.length < 5 && attempts < 30) {
       const suffix = attempts === 0 ? '' : Math.floor(Math.random() * 1000);
       const candidate = `${baseUsername}${suffix}`;
 
-      const lookup = new URL(`${url}/rest/v1/users`);
+      const lookup = new URL('https://dummy.local'); // base not used
       lookup.searchParams.set('select', 'id');
       lookup.searchParams.set('username', `ilike.${candidate}`);
       lookup.searchParams.set('limit', '1');
 
-      const res = await supabaseRequest(c.env, lookup.pathname + lookup.search, { method: 'GET' });
+      const res = await supabaseRequest(c.env, `/users${lookup.search}`, { method: 'GET' });
       const rows = await res.json();
 
       if (res.ok && Array.isArray(rows) && rows.length === 0 && !usernames.includes(candidate)) {
@@ -79,15 +77,13 @@ app.post('/complete-onboarding', async (c) => {
       return c.json({ error: 'Faltan datos requeridos' }, 400);
     }
 
-    const { url } = getSupabaseConfig(c.env);
-
     // Check username availability
-    const lookup = new URL(`${url}/rest/v1/users`);
+    const lookup = new URL('https://dummy.local'); // base not used
     lookup.searchParams.set('select', 'id');
     lookup.searchParams.set('username', `ilike.${username}`);
     lookup.searchParams.set('limit', '1');
 
-    const usernameRes = await supabaseRequest(c.env, lookup.pathname + lookup.search, { method: 'GET' });
+    const usernameRes = await supabaseRequest(c.env, `/users${lookup.search}`, { method: 'GET' });
     const usernameRows = await usernameRes.json();
     if (!usernameRes.ok) {
       return c.json({ error: usernameRows?.message || 'Error checking username' }, 500);
